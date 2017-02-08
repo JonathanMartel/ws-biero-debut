@@ -4,7 +4,7 @@
  * Fichier de lancement du service Web
  * @author Jonathan Martel
  * @version 1.0
- * @update 2016-03-31
+ * @update 2017-02-08
  * @license MIT
  * @see http://www.lornajane.net/posts/2012/building-a-restful-php-server-understanding-the-request
  * 

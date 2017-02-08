@@ -20,6 +20,7 @@ class BiereControleur
 	public function getAction(Requete $oReq)
 	{
 		$res = array();
+		var_dump($oReq->url_element);
 		if(isset($oReq->url_element[1]) && is_numeric($oReq->url_element[1]))//Route : /biere/:id/..
 		{
 			$id_biere = (int) $oReq->url_element[1];
@@ -39,10 +40,15 @@ class BiereControleur
 			}
 			else //Route : biere/:id
 			{
+				
 				$res = $this->getBiere($id_biere);
 			}
 		}
-		//$res = $this->getListeBiere();
+		else
+		{
+			$res = $this->getListeBiere();	
+		}
+		
 		
         return $res;	
 	}
