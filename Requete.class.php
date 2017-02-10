@@ -59,6 +59,7 @@ class Requete
 				$parametres[$nom] = $this->aseptiserParametre($valeur);
 			}
 		}
+		$this->parametres = $parametres;
     }
 	
 	/**
