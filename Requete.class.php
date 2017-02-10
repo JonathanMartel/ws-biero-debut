@@ -46,26 +46,18 @@ class Requete
         
         $donnees_brut = file_get_contents("php://input");
 		
-		$content_type = false;
-		if(isset($_SERVER['CONTENT_TYPE']))
-		{
-			$content_type = $_SERVER['CONTENT_TYPE'];
-		}
+		//$content_type = false;
+		//if(isset($_SERVER['CONTENT_TYPE']))
+		//{
+		//	$content_type = $_SERVER['CONTENT_TYPE'];
+		//}
 		
-		switch($content_type)
+		$donnees = json_decode($donnees_brut);
+		if($donnees)
 		{
-			case "application/json":
-				$donnees = json_decode($donnees_brut);
-				if($donnees)
-				{
-					foreach ($donnees as $nom => $valeur) {
-						$parametres[$nom] = $this->aseptiserParametre($valeur);
-					}
-				}
-				break;
-			default:
-				$this->erreur(400);
-			
+			foreach ($donnees as $nom => $valeur) {
+				$parametres[$nom] = $this->aseptiserParametre($valeur);
+			}
 		}
     }
 	

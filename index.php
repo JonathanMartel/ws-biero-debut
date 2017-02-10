@@ -58,6 +58,7 @@ if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
 			
 			// Ma vue
 			echo json_encode($resultat);
+
 		}
 		else
 		{
