@@ -1,66 +1,66 @@
 <?php
 /**
  * Class Requete
- * Gère les requêtes HTTP (Router)
+ * Gère les requêtes HTTP
  * 
  * @author Jonathan Martel
- * @version 1.0
- * @update 2017-02-08
+ * @version 1.1
+ * @update 2019-11-08
  * @license MIT
  * @see http://www.lornajane.net/posts/2012/building-a-restful-php-server-understanding-the-request
  */
 
 class Requete 
 {
-	public $verbe;
-	public $parametres;
-	public $url_element;
+    public $url_elements;
+    public $ressource;
+    public $verbe;
+    public $parametres;
 	private $_db;
 	
-  	public function __construct() {
-    	// Connection mySQL
-		$this->_db = MonSQL::getInstance();
-		
-		// Analyse de la requête 
+    public function __construct() {
+        $this->_db = MonSQL::getInstance();
+        
 		$this->verbe = $_SERVER['REQUEST_METHOD'];
-	   	$_GET['url'] = trim($_GET['url'], '\/');
-	   	//var_dump($_GET);
-	   	$this->url_element = explode("/", $_GET['url']);
 		
-		// Traitement des paramètres 
-       	$this->traitementParametre();
+        $_GET['url'] = (isset($_GET['url']) ? $_GET['url'] : "");
+		$_GET['url'] = trim($_GET['url'], '\/');
+        $this->url_elements = explode('/', $_GET['url']);
+        $this->traitementParametre();
+        
+        $this->ressource = $this->url_elements[0];
+        array_splice($this->url_elements,0,1);
 	}
-	
+
 	/**
 	 * Décode les paramètres de la requête
 	 * @access private
 	 */
-	private function traitementParametre() {
+	public function traitementParametre() {
         $parametres = array();
-        
-		if(isset($_SERVER['QUERY_STRING']))
-		{
-			parse_str($_SERVER['QUERY_STRING'], $parametres);
-			unset($parametres['url']);
-		}
-        
-        $donnees_brut = file_get_contents("php://input");
+
+        // first of all, pull the GET vars
+        if (isset($_SERVER['QUERY_STRING'])) {
+            parse_str($_SERVER['QUERY_STRING'], $parametres);
+        }
+
+       	unset($parametres['url']);
+        $body = file_get_contents("php://input");
+		$content_type = false;
+        if(isset($_SERVER['CONTENT_TYPE'])) {
+            $content_type = $_SERVER['CONTENT_TYPE'];
+        }
+				
+        $body_params = json_decode($body);
 		
-		//$content_type = false;
-		//if(isset($_SERVER['CONTENT_TYPE']))
-		//{
-		//	$content_type = $_SERVER['CONTENT_TYPE'];
-		//}
-		
-		$donnees = json_decode($donnees_brut);
-		if($donnees)
-		{
-			foreach ($donnees as $nom => $valeur) {
+        if($body_params) {
+            foreach($body_params as $nom => $valeur) {
 				$parametres[$nom] = $this->aseptiserParametre($valeur);
-			}
-		}
-		$this->parametres = $parametres;
-    }
+            }
+        }
+        
+        $this->parametres = $parametres;
+	}
 	
 	/**
 	 * Permet de nettoyer les valeurs passées en paramètre
@@ -70,19 +70,11 @@ class Requete
 	 */
 	private function aseptiserParametre($valeur)
 	{
-		$valeur = $this->_db->real_escape_string($valeur);
-		$valeur = htmlspecialchars($valeur);
+        if(is_string($valeur)){
+            $valeur = $this->_db->real_escape_string($valeur);
+            $valeur = htmlspecialchars($valeur);
+        }
 		return $valeur;
-	}
-	
-	/**
-	 * Génère le code d'erreur passé en paramètre
-	 * @access public
-	 */	
-	public function erreur($code)
-	{
-		http_response_code($code);
-		
-	}
+	} 	
 }
 ?>

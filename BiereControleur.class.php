@@ -4,53 +4,56 @@
  * Controleur de la ressource Biere
  * 
  * @author Jonathan Martel
- * @version 1.0
- * @update 2017-02-08
+ * @version 1.1
+ * @update 2019-11-11
  * @license MIT
  */
 
   
 class BiereControleur 
 {
+	private $retour = array('data'=>array());
+
 	/**
 	 * Méthode qui gère les action en GET
 	 * @param Requete $oReq
 	 * @return Mixed Données retournées
 	 */
-	public function getAction(Requete $oReq)
+	public function getAction(Requete $requete)
 	{
-		$res = array();
-		//var_dump($oReq->url_element)
-		if(isset($oReq->url_element[1]) && is_numeric($oReq->url_element[1]))//Route : /biere/:id/..
+		if(isset($requete->url_elements[0]) && is_numeric($requete->url_elements[0]))	// Normalement l'id de la biere 
 		{
-			$id_biere = (int) $oReq->url_element[1];
-			if(isset($oReq->url_element[2])) //Route : biere/:id/{note, commentaire}
+			$id_biere = (int)$requete->url_elements[0];
+			
+			if(isset($requete->url_elements[1])) 
 			{
-				switch ($oReq->url_element[2]) {
-					case 'note':
-							$res = $this->getNote($id_biere);
-						break;
+				switch($requete->url_elements[1]) 
+				{
 					case 'commentaire':
-							$res = $this->getCommentaire($id_biere);
+						$this->retour["data"] = $this->getCommentaire($id_biere);
+						break;
+					case 'note':
+						$this->retour["data"] = $this->getNote($id_biere);
 						break;
 					default:
-						$oReq->erreur(400);
+						$this->retour['erreur'] = $this->erreur();
+						unset($this->retour['data']);
 						break;
 				}
-			}
-			else //Route : biere/:id
+			} 
+			else // Retourne les infos d'une bière
 			{
-				
-				$res = $this->getBiere($id_biere);
+				$this->retour["data"] = $this->getBiere($id_biere);
 			}
-		}
-		else
+		} 
+		else 
 		{
-			$res = $this->getListeBiere();	
+			$this->retour["data"] = $this->getListeBiere();
+			
 		}
+
+        return $this->retour;		
 		
-		
-        return $res;	
 	}
 	
 	/**
@@ -62,13 +65,10 @@ class BiereControleur
 	{
 		if(!$this->valideAuthentification())
 		{
-			$oReq->erreur(401);
-			exit;
+			$this->retour['erreur'] = $this->erreur(401);
 		}
 		
-		$res = array();
-		
-		return $res;
+		return $this->retour;
 	}
 	
 	/**
@@ -81,13 +81,10 @@ class BiereControleur
 		var_dump($oReq);
 		if(!$this->valideAuthentification())
 		{
-			$oReq->erreur(401);
-			exit;
+			$this->retour['erreur'] = $this->erreur(401);
 		}
 		
-		$res = array();
-		
-		return $res;
+		return $this->retour;
 	}
 	
 	/**
@@ -99,13 +96,10 @@ class BiereControleur
 	{
 		if(!$this->valideAuthentification())
 		{
-			$oReq->erreur(401);
-			exit;
+			$this->retour['erreur'] = $this->erreur(401);
 		}
 		
-		$res = array();
-		
-		return $res;
+		return $this->retour;
 		
 	}
 	
@@ -186,5 +180,15 @@ class BiereControleur
 		}
       	return $access;
     }
+
+	
+	private function erreur($code, $data="")
+	{
+		//header('HTTP/1.1 400 Bad Request');
+		http_response_code($code);
+
+		return array("message"=>"Erreur de requete", "code"=>$code);
 		
+	}
+
 }
