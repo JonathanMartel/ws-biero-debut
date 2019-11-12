@@ -10,7 +10,7 @@
  */
 
   
-class BiereControleur 
+class BiereControlleur 
 {
 	private $retour = array('data'=>array());
 
@@ -36,7 +36,7 @@ class BiereControleur
 						$this->retour["data"] = $this->getNote($id_biere);
 						break;
 					default:
-						$this->retour['erreur'] = $this->erreur();
+						$this->retour['erreur'] = $this->erreur(400);
 						unset($this->retour['data']);
 						break;
 				}

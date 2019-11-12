@@ -33,7 +33,7 @@ if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
    	//var_dump($_GET);
    
 	$oReq = new Requete();
-	//var_dump($oReq);
+	
 	/* Instanciation du controlleur */
 	if($oReq->ressource == ""){
 		http_response_code(400);
